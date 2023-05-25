@@ -2,7 +2,6 @@ package taeheoki.jpabook.jpashop.repository;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-import taeheoki.jpabook.jpashop.domain.Member;
 import taeheoki.jpabook.jpashop.domain.item.Item;
 
 import javax.persistence.EntityManager;

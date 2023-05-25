@@ -8,6 +8,9 @@ import taeheoki.jpabook.jpashop.domain.item.Item;
 import taeheoki.jpabook.jpashop.repository.ItemRepository;
 import taeheoki.jpabook.jpashop.repository.MemberRepository;
 import taeheoki.jpabook.jpashop.repository.OrderRepository;
+import taeheoki.jpabook.jpashop.repository.OrderSearch;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -58,7 +61,7 @@ public class OrderService {
     /**
      * 주문 검색
      */
-//    public List<Order> findOrders(OrderSearch orderSearch) {
-//        return orderRepository.findAll(orderSearch);
-//    }
+    public List<Order> findOrders(OrderSearch orderSearch) {
+        return orderRepository.findAllByString(orderSearch);
+    }
 }
