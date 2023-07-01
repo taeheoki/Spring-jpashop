@@ -3,7 +3,10 @@ package taeheoki.jpabook.jpashop.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import taeheoki.jpabook.jpashop.domain.*;
+import taeheoki.jpabook.jpashop.domain.Delivery;
+import taeheoki.jpabook.jpashop.domain.Member;
+import taeheoki.jpabook.jpashop.domain.Order;
+import taeheoki.jpabook.jpashop.domain.OrderItem;
 import taeheoki.jpabook.jpashop.domain.item.Item;
 import taeheoki.jpabook.jpashop.repository.ItemRepository;
 import taeheoki.jpabook.jpashop.repository.MemberRepository;
@@ -26,6 +29,7 @@ public class OrderService {
      */
     @Transactional
     public Long order(Long memberId, Long itemId, int count) {
+
         // 엔티티 조회
         Member member = memberRepository.findOne(memberId);
         Item item = itemRepository.findOne(itemId);
@@ -33,9 +37,8 @@ public class OrderService {
         // 배송정보 생성
         Delivery delivery = new Delivery();
         delivery.setAddress(member.getAddress());
-        delivery.setStatus(DeliveryStatus.READY);
 
-        // 주문상품 생성
+        // 주문 상품 생성
         OrderItem orderItem = OrderItem.createOrderItem(item, item.getPrice(), count);
 
         // 주문 생성
@@ -62,6 +65,6 @@ public class OrderService {
      * 주문 검색
      */
     public List<Order> findOrders(OrderSearch orderSearch) {
-        return orderRepository.findAllByString(orderSearch);
+        return orderRepository.findAllByCriteria(orderSearch);
     }
 }

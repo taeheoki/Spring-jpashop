@@ -9,8 +9,7 @@ import taeheoki.jpabook.jpashop.domain.item.Item;
 import javax.persistence.*;
 
 @Entity
-@Getter
-@Setter
+@Getter @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class OrderItem {
 
@@ -20,17 +19,17 @@ public class OrderItem {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "item_id")
-    private Item item; // 주문 상품
+    @JoinColumn(name ="item_id")
+    private Item item;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id")
-    private Order order; // 주문
+    @JoinColumn(name ="order_id")
+    private Order order;
 
     private int orderPrice; // 주문 가격
     private int count; // 주문 수량
 
-    //== 생성 메서드 ==//
+    // == 생성 메서드 == //
     public static OrderItem createOrderItem(Item item, int orderPrice, int count) {
         OrderItem orderItem = new OrderItem();
         orderItem.setItem(item);
@@ -41,16 +40,19 @@ public class OrderItem {
         return orderItem;
     }
 
-    //== 비즈니스 로직 ==//
+    //==비즈니스 로직==//
+    /**
+     * 주문 취소
+     */
     public void cancel() {
-        item.addStock(count);
+        getItem().addStock(count);
     }
 
-    //== 조회 로직 ==//
+    //== 조회 로직==//
     /**
-     * 전체 주문 가격 조회
+     * 주문 상품 전체 가격 조회
      */
     public int getTotalPrice() {
-        return orderPrice * count;
+        return getOrderPrice() * getCount();
     }
 }

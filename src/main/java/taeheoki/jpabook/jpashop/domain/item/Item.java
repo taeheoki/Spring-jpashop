@@ -9,13 +9,12 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
 @Getter
 @Setter
+@Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "dtype")
 public abstract class Item {
-
     @Id
     @GeneratedValue
     @Column(name = "item_id")
@@ -29,6 +28,7 @@ public abstract class Item {
     private List<Category> categories = new ArrayList<>();
 
     // == 비즈니스 로직 == /
+
     /**
      * stock 증가
      */

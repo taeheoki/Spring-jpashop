@@ -1,6 +1,5 @@
 package taeheoki.jpabook.jpashop.service;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,7 +15,8 @@ import taeheoki.jpabook.jpashop.repository.OrderRepository;
 
 import javax.persistence.EntityManager;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
 @Transactional
@@ -40,15 +40,18 @@ class OrderServiceTest {
         Long orderId = orderService.order(member.getId(), book.getId(), orderCount);
 
         //then
+        Order getOrder = orderRepository.findOne(orderId);
         // 상품 주문시 상태는 ORDER
-        assertThat(orderRepository.findOne(orderId).getStatus()).isEqualTo(OrderStatus.ORDER);
+        assertThat(getOrder.getStatus()).isEqualTo(OrderStatus.ORDER);
         // 주문한 상품 종류 수가 정확해야 한다.
-        assertThat(orderRepository.findOne(orderId).getOrderItems().size()).isEqualTo(1);
+        assertThat(getOrder.getOrderItems().size()).isEqualTo(1);
         // 주문 가격은 가격 * 수량이다.
-        assertThat(orderRepository.findOne(orderId).getTotalPrice()).isEqualTo(book.getPrice() * orderCount);
+        assertThat(getOrder.getTotalPrice()).isEqualTo(10000 * orderCount);
         // 주문 수량만큼 재고가 줄어야 한다.
         assertThat(book.getStockQuantity()).isEqualTo(8);
     }
+
+
 
     @Test
     public void 상품주문_재고수량초과() throws Exception {
@@ -62,31 +65,29 @@ class OrderServiceTest {
         assertThatThrownBy(() -> orderService.order(member.getId(), book.getId(), orderCount))
                 .isInstanceOf(NotEnoughStockException.class);
 
-        // then
-
+        //then
     }
 
     @Test
     public void 주문취소() throws Exception {
         // given
         Member member = createMember();
-        Item book = createBook("시골 JPA", 10000, 10);
+        Item item = createBook("시골 JPA", 10000, 10);
 
         int orderCount = 2;
 
-        Long orderId = orderService.order(member.getId(), book.getId(), orderCount);
+        Long orderId = orderService.order(member.getId(), item.getId(), orderCount);
 
         // when
         orderService.cancelOrder(orderId);
 
-        // then
-        Order order = orderRepository.findOne(orderId);
+        //then
+        Order getOrder = orderRepository.findOne(orderId);
 
-        // 주문 취소시 상태는 CANCEL이다.
-        assertThat(order.getStatus()).isEqualTo(OrderStatus.CANCEL);
+        // 주문 취소시 상태는 CANCEL 이다.
+        assertThat(getOrder.getStatus()).isEqualTo(OrderStatus.CANCEL);
         // 주문이 취소된 상품은 그만큼 재고가 증가해야 한다.
-        assertThat(book.getStockQuantity()).isEqualTo(10);
-
+        assertThat(item.getStockQuantity()).isEqualTo(10);
     }
 
     private Item createBook(String name, int price, int stockQuantity) {
@@ -105,5 +106,4 @@ class OrderServiceTest {
         em.persist(member);
         return member;
     }
-
 }
