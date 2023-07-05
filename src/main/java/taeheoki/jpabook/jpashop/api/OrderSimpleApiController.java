@@ -9,6 +9,8 @@ import taeheoki.jpabook.jpashop.domain.Order;
 import taeheoki.jpabook.jpashop.domain.OrderStatus;
 import taeheoki.jpabook.jpashop.repository.OrderRepository;
 import taeheoki.jpabook.jpashop.repository.OrderSearch;
+import taeheoki.jpabook.jpashop.repository.order.simplequery.OrderSimpleQueryDto;
+import taeheoki.jpabook.jpashop.repository.order.simplequery.OrderSimpleQueryRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,6 +27,7 @@ import java.util.stream.Collectors;
 public class OrderSimpleApiController {
 
     private final OrderRepository orderRepository;
+    private final OrderSimpleQueryRepository orderSimpleQueryRepository;
 
     /**
      * V1. 엔티티 직접 노출
@@ -49,6 +52,27 @@ public class OrderSimpleApiController {
     public List<SimpleOrderDto> ordersV2() {
         List<Order> orders = orderRepository.findAllByString(new OrderSearch());
         return orders.stream().map(SimpleOrderDto::new).collect(Collectors.toList());
+    }
+
+    /**
+     * V3. 엔티티를 조회해서 DTO로 변환 (fetch join 사용 O)
+     * - fetch join으로 쿼리 1번 호출
+     * 참고: fetch join에 대한 자세한 내용은 JPA 기본편 참고 (정말 중요함)
+     */
+    @GetMapping("/api/v3/simple-orders")
+    public List<SimpleOrderDto> ordersV3() {
+        List<Order> orders = orderRepository.findAllWithMemberDelivery();
+        return orders.stream().map(SimpleOrderDto::new).collect(Collectors.toList());
+    }
+
+    /**
+     * V4. JPA에서 DTO로 바로 조회
+     * - 쿼리 1번 호출
+     * - select 절에서 원하는 데이터만 선택해서 조회
+     */
+    @GetMapping("/api/v4/simple-orders")
+    public List<OrderSimpleQueryDto> ordersV4() {
+        return orderSimpleQueryRepository.findOrderDtos();
     }
 
     @Data
